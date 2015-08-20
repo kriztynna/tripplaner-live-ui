@@ -168,6 +168,32 @@ $("#addDay").on("click", function(){
   itineraries.push(new Day());
 });
 
+$('.day-buttons').on('click', '.day-btn', function(){
+  $('.day-btn').removeClass('current-day');
+  $(this).addClass('current-day');
+  var dayNumber = Number($(this).text());
+  $('#day-title').html('<span>Day '+dayNumber+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button>');
+  giraffe(dayNumber-1);
+});
+
+function giraffe(dayNum){
+  var currentHotel = itineraries[dayNum].hotel;
+  var currentFood = itineraries[dayNum].food;
+  var currentAct = itineraries[dayNum].act;
+  if (!currentHotel){
+    $("hotelGroup").html('');
+
+  }
+  else{
+  $("#hotelGroup").html('<li><span class="title">'+currentHotel.name+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+    
+  }
+
+
+
+}
+
+
 
 $(document).ready(function() {
   initialize_gmaps();
