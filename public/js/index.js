@@ -113,27 +113,50 @@ var styleArr = [{
   }]
 }];
 
+var itineraries = [];
+
+function Day(){
+  this.hotel = null;
+  this.food = [];
+  this.act = [];
+}
+
+
 $("#addHotel").on("click",function(){
+  var dayIndex = Number($('.current-day').text())-1;
+  console.log(dayIndex);
   var value = $("#hotelList").val();
-  console.log(value)
   $("#hotelGroup").html('<li><span class="title">'+value+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+  itineraries[dayIndex].hotel = value;
+  console.log(itineraries);
 });
 
 $("#addFood").on("click",function(){
+  var dayIndex = Number($('.current-day').text())-1;
   var value = $("#foodList").val();
   $("#foodGroup").append('<li><span class="title">'+value+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+  itineraries[dayIndex].food.push(value);
 });
 
 $("#addAct").on("click",function(){
+  var dayIndex = Number($('.current-day').text())-1;
   var value = $("#actList").val();
   $("#actGroup").append('<li><span class="title">'+value+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+  itineraries[dayIndex].act.push(value);
 });
 
 $(".list-group").on("click",'.remove',function(){
   $(this).parent().remove();
 });
 
+$("#addDay").on("click", function(){
+  var number = $('.day-buttons button').length;
+  $(this).before('<button class="btn btn-circle day-btn">'+ number +'</button>');
+  itineraries.push(new Day());
+});
+
 
 $(document).ready(function() {
   initialize_gmaps();
+  itineraries.push(new Day());
 });
