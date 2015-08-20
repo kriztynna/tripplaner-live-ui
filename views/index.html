@@ -17,8 +17,7 @@
             <h4>Hotels</h4>
             <select id="hotelList">
               {% for hotel in all_hotels %}
-              <!--loop.index0-->
-              <option value="{{hotel.name}}">{{ hotel.name }}</option>
+              <option value="{{ loop.index0 }}">{{ hotel.name }}</option>
               {% endfor %}
             </select>
             <button class="btn btn-primary btn-circle pull-right" id="addHotel">+</button>
@@ -27,7 +26,7 @@
             <h4>Restaurants</h4>
             <select id="foodList">
               {% for restaurant in all_restaurants %}
-              <option value="{{restaurant.name}}">{{ restaurant.name }}</option>
+              <option value="{{loop.index0}}">{{ restaurant.name }}</option>
               {% endfor %}
             </select>
             <button class="btn btn-primary btn-circle pull-right" id="addFood">+</button>
@@ -36,7 +35,7 @@
             <h4>Activities</h4>
             <select id="actList">
               {% for activity in all_activities %}
-              <option value="{{activity.name}}">{{ activity.name }}</option>
+              <option value="{{loop.index0}}">{{ activity.name }}</option>
               {% endfor %}
             </select>
             <button class="btn btn-primary btn-circle pull-right" id="addAct">+</button>
