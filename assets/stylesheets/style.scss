@@ -11,6 +11,14 @@ body {
   min-width: -webkit-min-content;
 }
 
+li {
+  list-style-type: none;
+  span {
+    padding-right: 10px;
+  }
+}
+
+
 #app {
   border-left: 2px solid lighten($medium-brown, 25%);
   border-right: 2px solid lighten($medium-brown, 25%);
@@ -134,6 +142,16 @@ h3 {
       background: #fff;
     }
   }
+}
+
+#addDay {
+  border-width: 2px;
+  width: 30px;
+  height: 30px;
+  padding: 5px 5px;
+  background: $transparent;
+  border-color: $light-blue;
+  color: $light-blue;
 }
 
 .panel-default {

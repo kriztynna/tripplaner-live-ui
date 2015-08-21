@@ -4,6 +4,11 @@ body {
   font-family: 'Varela Round', sans-serif;
   min-width: -webkit-min-content; }
 
+li {
+  list-style-type: none; }
+  li span {
+    padding-right: 10px; }
+
 #app {
   border-left: 2px solid #b1a398;
   border-right: 2px solid #b1a398; }
@@ -103,6 +108,15 @@ h3 {
     color: #736357; }
     .day-btn.current-day:hover {
       background: #fff; }
+
+#addDay {
+  border-width: 2px;
+  width: 30px;
+  height: 30px;
+  padding: 5px 5px;
+  background: transparent;
+  border-color: #a8c9dd;
+  color: #a8c9dd; }
 
 .panel-default {
   background: #efecea;

@@ -7,14 +7,37 @@ function Day(){
 }
 
 function initialize_gmaps() {
-  //console.log(all_hotels);
+  var styleArr = [
+    {
+      stylers: [
+        { hue: "#00ffe6" },
+        { saturation: -20 }
+      ]
+    },{
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [
+        { lightness: 100 },
+        { visibility: "simplified" }
+      ]
+    },{
+      featureType: "road",
+      elementType: "labels",
+      stylers: [
+        { visibility: "off" }
+      ]
+    }
+  ];
+  var styledMap = new google.maps.StyledMapType(styleArr,
+    {name: "Styled Map"});
+
   // initialize new google maps LatLng object
   var myLatlng = new google.maps.LatLng(40.705189,-74.009209);
   // set the map options hash
   var mapOptions = {
     center: myLatlng,
-    zoom: 13,
-    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    zoom: 14,
+    mapTypeId: [google.maps.MapTypeId.ROADMAP,'map_style'],
     styles: styleArr
   };
 
@@ -22,6 +45,8 @@ function initialize_gmaps() {
   var map_canvas_obj = document.getElementById("map-canvas");
   // initialize a new Google Map with the options
   var map = new google.maps.Map(map_canvas_obj, mapOptions);
+  map.mapTypes.set('map_style', styledMap);
+  map.setMapTypeId('map_style');
   // Add the marker to the map
   var marker = new google.maps.Marker({
     position: myLatlng,
@@ -85,73 +110,14 @@ function initialize_gmaps() {
     }
   }
 
-var styleArr = [{
-  featureType: "landscape",
-  stylers: [{
-    saturation: -100
-  }, {
-    lightness: 60
-  }]
-}, {
-  featureType: "road.local",
-  stylers: [{
-    saturation: -100
-  }, {
-    lightness: 40
-  }, {
-    visibility: "on"
-  }]
-}, {
-  featureType: "transit",
-  stylers: [{
-    saturation: -100
-  }, {
-    visibility: "simplified"
-  }]
-}, {
-  featureType: "administrative.province",
-  stylers: [{
-    visibility: "off"
-  }]
-}, {
-  featureType: "water",
-  stylers: [{
-    visibility: "on"
-  }, {
-    lightness: 30
-  }]
-}, {
-  featureType: "road.highway",
-  elementType: "geometry.fill",
-  stylers: [{
-    color: "#ef8c25"
-  }, {
-    lightness: 40
-  }]
-}, {
-  featureType: "road.highway",
-  elementType: "geometry.stroke",
-  stylers: [{
-    visibility: "off"
-  }]
-}, {
-  featureType: "poi.park",
-  elementType: "geometry.fill",
-  stylers: [{
-    color: "#b6c54c"
-  }, {
-    lightness: 40
-  }, {
-    saturation: -40
-  }]
-}];
+
 
 
 $("#addHotel").on("click",function(){
   var dayIndex = Number($('.current-day').text())-1;
   var value = $("#hotelList").val();
   var hotel = all_hotels[value];
-  $("#hotelGroup").html('<li><span class="title">'+hotel.name+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+  $("#hotelGroup").html('<li class="itinerary-item"><span class="title">'+hotel.name+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
   itineraries[dayIndex].hotel = hotel;
   giraffe(dayIndex+1);
 });
@@ -160,7 +126,7 @@ $("#addFood").on("click",function(){
   var dayIndex = Number($('.current-day').text())-1;
   var value = $("#foodList").val();
   var food = all_restaurants[value];
-  $("#foodGroup").append('<li><span class="title">'+food.name+'</span><button value="'+food.name+'"class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+  $("#foodGroup").append('<li class="itinerary-item"><span class="title">'+food.name+'</span><button value="'+food.name+'"class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
   itineraries[dayIndex].food.push(food);
   giraffe(dayIndex+1);
 });
@@ -169,7 +135,7 @@ $("#addAct").on("click",function(){
   var dayIndex = Number($('.current-day').text())-1;
   var value = $("#actList").val();
   var act = all_activities[value];
-  $("#actGroup").append('<li><span class="title">'+act.name+'</span><button value="'+act.name+'" class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+  $("#actGroup").append('<li class="itinerary-item"><span class="title">'+act.name+'</span><button value="'+act.name+'" class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
   itineraries[dayIndex].act.push(act);
   giraffe(dayIndex+1);
 });
