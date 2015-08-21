@@ -1,5 +1,6 @@
-$light-blue: #a8c9dd;
-$medium-brown: #736357;
+$light-blue: #D5FBFF;
+$dark-gray: #2F3738;
+$medium-brown: #647678;
 $transparent: rgba(0,0,0,0);
 
 $screen-sm: 768px;
@@ -103,7 +104,7 @@ select {
 }
 
 h4 {
-  color: #aaa;
+  color: $dark-gray;
   margin-top: 0;
 }
 
