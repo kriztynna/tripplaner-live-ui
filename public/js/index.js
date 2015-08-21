@@ -37,8 +37,9 @@ function initialize_gmaps() {
   var mapOptions = {
     center: myLatlng,
     zoom: 14,
-    mapTypeId: [google.maps.MapTypeId.ROADMAP,'map_style'],
-    styles: styleArr
+    mapTypeControlOptions: {
+      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+    }
   };
 
   // get the maps div's HTML obj
