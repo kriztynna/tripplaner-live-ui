@@ -68,9 +68,9 @@ function initialize_gmaps() {
     removeMarkers();
     if (hotelLocation.length || restaurantLocations.length || activityLocations.length) {
           var bounds = new google.maps.LatLngBounds();
-          drawLocation(hotelLocation, {
-          icon: '/images/lodging_0star.png'
-        },hotelMarker,bounds);
+          if (hotelLocation.length){
+            drawLocation(hotelLocation, {icon: '/images/lodging_0star.png'}, hotelMarker, bounds);  
+          }
         restaurantLocations.forEach(function (loc) {
           drawLocation(loc, {
             icon: '/images/restaurant.png'
