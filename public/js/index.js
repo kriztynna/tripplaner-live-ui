@@ -62,40 +62,6 @@ function initialize_gmaps() {
   var restaurantLocations = [];
   var activityLocations = [];
   
-  // drawLocation(hotelLocation, {
-  //   icon: '/images/lodging_0star.png'
-  // });
-  // restaurantLocations.forEach(function (loc) {
-  //   drawLocation(loc, {
-  //     icon: '/images/restaurant.png'
-  //   });
-  // });
-  // activityLocations.forEach(function (loc) {
-  //   drawLocation(loc, {
-  //     icon: '/images/star-3.png'
-  //   });
-  // });
-
-  function drawNewHotel (newHotel) {
-    if (hotelMarker.length) {hotelMarker[0].setMap(null);hotelMarker.length=0;}
-    drawLocation(newHotel, {
-      icon: '/images/lodging_0star.png'
-    },hotelMarker);
-  }
-
-  function drawNewRestaurant (newRestaurant) {
-    console.log(newRestaurant);
-    drawLocation(newRestaurant, {
-      icon: '/images/restaurant.png'
-    },restaurantMarkers);
-  }
-
-  function drawNewActivity (newActivity) {
-    drawLocation(newActivity, {
-      icon: '/images/star-3.png'
-    },activityMarkers);
-  }
-
   function drawAllLocations(hotelLocation,restaurantLocations,activityLocations) {
     removeMarkers();
     drawLocation(hotelLocation, {
@@ -182,8 +148,7 @@ $("#addHotel").on("click",function(){
   var hotel = all_hotels[value];
   $("#hotelGroup").html('<li><span class="title">'+hotel.name+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
   itineraries[dayIndex].hotel = hotel;
-  hotelLocation[0] = [hotel.place[0].location[0],hotel.place[0].location[1]];
-  drawNewHotel(hotelLocation[0]);
+  giraffe(dayIndex+1);
 });
 
 $("#addFood").on("click",function(){
@@ -192,8 +157,7 @@ $("#addFood").on("click",function(){
   var food = all_restaurants[value];
   $("#foodGroup").append('<li><span class="title">'+food.name+'</span><button value="'+food.name+'"class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
   itineraries[dayIndex].food.push(food);
-  restaurantLocations.push([food.place[0].location[0],food.place[0].location[1]]);
-  drawNewRestaurant(restaurantLocations[restaurantLocations.length-1]);
+  giraffe(dayIndex+1);
 });
 
 $("#addAct").on("click",function(){
@@ -202,8 +166,7 @@ $("#addAct").on("click",function(){
   var act = all_activities[value];
   $("#actGroup").append('<li><span class="title">'+act.name+'</span><button value="'+act.name+'" class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
   itineraries[dayIndex].act.push(act);
-  activityLocations.push([act.place[0].location[0],act.place[0].location[1]]);
-  drawNewActivity(activityLocations[activityLocations.length-1]);
+  giraffe(dayIndex+1);
 });
 
 var dict = {"foodGroup": "food", "hotelGroup": "hotel", "actGroup": "act"};
@@ -213,12 +176,16 @@ $(".list-group").on("click",'.remove',function(){
   var type = $(this).parent().parent().attr("id");
   var rightType = dict[type];
   var listToModify = itineraries[dayIndex][rightType];
-  if (type==="hotelGroup") {itineraries[dayIndex][rightType]=null;}
+  if (type==="hotelGroup") {
+    itineraries[dayIndex][rightType]=null;
+  }
   else {
     var name = $(this).val();
     var temp = itineraries[dayIndex][rightType].filter(function(a){return a.name!=name;});
     itineraries[dayIndex][rightType] = temp.map(function(a){return a;});
+
   }
+  giraffe(dayIndex+1);
   $(this).parent().remove();
 });
 
@@ -265,19 +232,6 @@ function giraffe(dayNum){
     }
   }
   drawAllLocations(hotelLocation,restaurantLocations,activityLocations);
-  // drawLocation(hotelLocation, {
-  //   icon: '/images/lodging_0star.png'
-  // });
-  // restaurantLocations.forEach(function (loc) {
-  //   drawLocation(loc, {
-  //     icon: '/images/restaurant.png'
-  //   });
-  // });
-  // activityLocations.forEach(function (loc) {
-  //   drawLocation(loc, {
-  //     icon: '/images/star-3.png'
-  //   });
-  // });
 }
 
 $('#day-title').on('click', '.remove', function(){
