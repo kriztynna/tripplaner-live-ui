@@ -3,6 +3,8 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var swig = require('swig');
 var sassMiddleware = require('node-sass-middleware'); 
+var favicon = require('serve-favicon');
+var path = require('path');
 
 var app = express();
 
@@ -30,6 +32,9 @@ app.use(
 
 // serve static files
 app.use(express.static(__dirname + '/public'));
+
+// favicon
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 // serve routes
 app.use(require('./routes'));
