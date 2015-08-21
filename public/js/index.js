@@ -1,5 +1,5 @@
 function initialize_gmaps() {
-  console.log(all_hotels);
+  // console.log(all_hotels);
   // initialize new google maps LatLng object
   var myLatlng = new google.maps.LatLng(40.705189,-74.009209);
   // set the map options hash
@@ -172,26 +172,55 @@ $('.day-buttons').on('click', '.day-btn', function(){
   $('.day-btn').removeClass('current-day');
   $(this).addClass('current-day');
   var dayNumber = Number($(this).text());
-  $('#day-title').html('<span>Day '+dayNumber+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button>');
-  giraffe(dayNumber-1);
+  giraffe(dayNumber);
 });
 
 function giraffe(dayNum){
-  var currentHotel = itineraries[dayNum].hotel;
-  var currentFood = itineraries[dayNum].food;
-  var currentAct = itineraries[dayNum].act;
-  if (!currentHotel){
-    $("hotelGroup").html('');
-
+  var currentHotel = itineraries[dayNum-1].hotel;
+  var currentFood = itineraries[dayNum-1].food;
+  var currentAct = itineraries[dayNum-1].act;
+  $('#day-title').html('<span>Day '+dayNum+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button>');
+  $("#hotelGroup").html('');
+  if (currentHotel){
+    $("#hotelGroup").html('<li><span class="title">'+currentHotel.name+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>'); 
+    }
+  $("#foodGroup").html('');
+  if (currentFood.length){
+    for (var i = 0; i < currentFood.length; i++){
+    $("#foodGroup").append('<li><span class="title">'+currentFood[i].name+'</span><button value="'+currentFood[i].name+'"class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+    }
   }
-  else{
-  $("#hotelGroup").html('<li><span class="title">'+currentHotel.name+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
-    
+  $("#actGroup").html('');
+  if (currentAct.length){
+     for (var j = 0; j < currentAct.length; j++){
+    $("#actGroup").append('<li><span class="title">'+currentAct[j].name+'</span><button value="'+currentAct[j].name+'" class="btn btn-xs btn-danger remove btn-circle">x</button></li>');
+    }
   }
-
-
-
 }
+
+$('#day-title').on('click', '.remove', function(){
+   var dayIndex = Number($('.current-day').text())-1;
+   itineraries.splice(dayIndex, 1);
+   if (dayIndex !== itineraries.length){
+    giraffe(dayIndex +1 );
+    $('.day-buttons .day-btn').last().remove();
+   }
+   else{
+    giraffe(dayIndex);
+    $('.day-buttons .day-btn').last().remove();
+    $('.day-buttons .day-btn').last().addClass('current-day');
+   }
+   
+
+
+});
+
+
+
+
+
+
+
 
 
 
