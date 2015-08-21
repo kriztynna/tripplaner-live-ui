@@ -17,6 +17,7 @@ function initialize_gmaps() {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     styles: styleArr
   };
+
   // get the maps div's HTML obj
   var map_canvas_obj = document.getElementById("map-canvas");
   // initialize a new Google Map with the options
@@ -27,7 +28,7 @@ function initialize_gmaps() {
     title:"Hello World!"
   });
 
-  function drawLocation (location, opts, markerList) {
+  function drawLocation (location, opts, markerList,bounds) {
     if (typeof opts !== 'object') {
       opts = {};
     }
@@ -36,6 +37,7 @@ function initialize_gmaps() {
     opts.map = map;
     var marker = new google.maps.Marker(opts);
     markerList.push(marker);
+    if (bounds) {bounds.extend(marker.position);}
   }
 
   var hotelMarker = [];
@@ -64,21 +66,24 @@ function initialize_gmaps() {
   
   function drawAllLocations(hotelLocation,restaurantLocations,activityLocations) {
     removeMarkers();
-    drawLocation(hotelLocation, {
-    icon: '/images/lodging_0star.png'
-  },hotelMarker);
-  restaurantLocations.forEach(function (loc) {
-    drawLocation(loc, {
-      icon: '/images/restaurant.png'
-    },restaurantMarkers);
-  });
-  activityLocations.forEach(function (loc) {
-    drawLocation(loc, {
-      icon: '/images/star-3.png'
-    },activityMarkers);
-  });
+    if (hotelLocation.length || restaurantLocations.length || activityLocations.length) {
+          var bounds = new google.maps.LatLngBounds();
+          drawLocation(hotelLocation, {
+          icon: '/images/lodging_0star.png'
+        },hotelMarker,bounds);
+        restaurantLocations.forEach(function (loc) {
+          drawLocation(loc, {
+            icon: '/images/restaurant.png'
+          },restaurantMarkers,bounds);
+        });
+        activityLocations.forEach(function (loc) {
+          drawLocation(loc, {
+            icon: '/images/star-3.png'
+          },activityMarkers,bounds);
+        });
+        map.fitBounds(bounds);
+    }
   }
-
 
 var styleArr = [{
   featureType: "landscape",
