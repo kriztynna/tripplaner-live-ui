@@ -103,8 +103,6 @@ function drawLocation (location, opts, markerList,bounds) {
 $("#addHotel").on("click",function(){
   var dayIndex = Number($('.current-day').text())-1;
   var value = $("#hotelList").val();
-  console.log(dayIndex);
-  console.log(value);
   $.ajax({
     method: 'GET',
     url: '/api/add/hotel/'+dayIndex+'/'+value,

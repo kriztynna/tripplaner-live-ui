@@ -10,16 +10,16 @@ var Promise = require('bluebird');
 
 router.get('/', function(req, res) {
   Promise.all([
-    Hotel.find(),
-    Restaurant.find(),
-    Activity.find()
+    Hotel.find({},'id name'),
+    Restaurant.find({},'id name'),
+    Activity.find({},'id name')
     ]).spread(function(hotels, restaurants, activities) {
       res.render('index', {
         all_hotels: hotels,
         all_restaurants: restaurants,
         all_activities: activities
       });
-    })
-})
+    });
+});
 
 module.exports = router;
