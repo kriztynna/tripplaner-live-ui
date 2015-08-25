@@ -4,6 +4,8 @@ var models = require('../models');
 var Hotel = models.Hotel;
 var Restaurant = models.Restaurant;
 var Activity = models.Activity;
+var Day = models.Day;
+var Trip = models.Trip;
 var Promise = require('bluebird');
 
 router.get('/', function(req, res) {

@@ -38,6 +38,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 // serve routes
 app.use(require('./routes'));
+app.use('/api/',require('./routes/api/days.js'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

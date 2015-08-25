@@ -1,10 +1,189 @@
-var itineraries = [];
+// globals to be filled in on load
+var map;
+var itineraries;
+// globals for maps
+// coordinates
+var hotelLocation = [];
+var restaurantLocations = [];
+var activityLocations = [];
+// marker objects
+var hotelMarker = [];
+var restaurantMarkers = [];
+var activityMarkers = [];
+// end globals
 
+// utility functions
 function Day(){
   this.hotel = null;
-  this.food = [];
-  this.act = [];
+  this.restaurants = [];
+  this.activities = [];
 }
+
+function makeList (listID,items) {
+  // first clear existing contents
+  $(listID).html('');
+  items.map(function(item){if (item) {$(listID).append('<li><span class="title">'+item.name+'</span><button value="'+item._id+'" class="btn btn-xs btn-danger remove btn-circle">x</button></li>');}});
+}
+
+function giraffe(dayNum){
+  console.log(itineraries);
+  // get the itinerary data for the day in question
+  var currentHotel = itineraries[dayNum-1].hotel;
+  var currentFood = itineraries[dayNum-1].restaurants;
+  var currentAct = itineraries[dayNum-1].activities;
+
+  // update the DOM to show the newly selected day
+  $('#day-title').html('<span>Day '+dayNum+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button>');
+  
+  // update the DOM to show the day's information
+  makeList("#hotelGroup",[currentHotel]);
+  makeList("#foodGroup",currentFood);
+  makeList("#actGroup",currentAct);
+  
+  // prep data for the map
+  if (currentHotel) {hotelLocation = [currentHotel.place[0].location[0],currentHotel.place[0].location[1]];}
+  else { hotelLocation = []; }
+  restaurantLocations = currentFood.map(function(food){return [food.place[0].location[0],food.place[0].location[1]];});
+  activityLocations = currentAct.map(function(act){return [act.place[0].location[0],act.place[0].location[1]];});
+
+  // update the map
+  drawAllLocations(hotelLocation,restaurantLocations,activityLocations,map);
+}
+// end utility functions
+
+// map drawing functions
+function drawAllLocations(hotelLocation,restaurantLocations,activityLocations,map) {
+  removeMarkers();
+  if (hotelLocation.length || restaurantLocations.length || activityLocations.length) {
+        var bounds = new google.maps.LatLngBounds();
+        if (hotelLocation.length){
+          drawLocation(hotelLocation, {icon: '/images/lodging_0star.png'}, hotelMarker, bounds);  
+        }
+      restaurantLocations.forEach(function (loc) {
+        drawLocation(loc, {
+          icon: '/images/restaurant.png'
+        },restaurantMarkers,bounds);
+      });
+      activityLocations.forEach(function (loc) {
+        drawLocation(loc, {
+          icon: '/images/star-3.png'
+        },activityMarkers,bounds);
+      });
+      map.fitBounds(bounds);
+  }
+}
+
+function removeMarkers(){
+  if (hotelMarker.length) {
+    hotelMarker[0].setMap(null);
+    hotelMarker.length=0;
+  }
+  if (restaurantMarkers.length) {
+    restaurantMarkers.map(function(a){a.setMap(null);});
+    restaurantMarkers.length = 0;
+  }
+  if (activityMarkers.length) {
+    activityMarkers.map(function(a){a.setMap(null);});
+    activityMarkers.length = 0;
+  }
+}
+
+function drawLocation (location, opts, markerList,bounds) {
+  if (typeof opts !== 'object') {
+    opts = {};
+  }
+  opts.position = new google.maps.LatLng(location[0], location[1]);
+  opts.map = map;
+  var marker = new google.maps.Marker(opts);
+  markerList.push(marker);
+  if (bounds) {bounds.extend(marker.position);}
+}
+// end of map drawing functions
+
+// click events
+$("#addHotel").on("click",function(){
+  var dayIndex = Number($('.current-day').text())-1;
+  var value = $("#hotelList").val();
+  $.ajax({
+    method: 'GET',
+    url: '/api/add/hotel/'+dayIndex+'/'+value,
+    success: function (modifiedDay){itineraries[dayIndex]=modifiedDay;giraffe(dayIndex+1);},
+    error: function (err) {console.log(err);}
+  });
+});
+
+$("#addFood").on("click",function(){
+  var dayIndex = Number($('.current-day').text())-1;
+  var value = $("#foodList").val();
+  $.ajax({
+    method: 'GET',
+    url: '/api/add/restaurants/'+dayIndex+'/'+value,
+    success: function (modifiedDay){itineraries[dayIndex]=modifiedDay;giraffe(dayIndex+1);},
+    error: function (err) {console.log(err);}
+  });
+});
+
+$("#addAct").on("click",function(){
+  var dayIndex = Number($('.current-day').text())-1;
+  var value = $("#actList").val();
+  var act = all_activities[value];
+  $.ajax({
+    method: 'GET',
+    url: '/api/add/activities/'+dayIndex+'/'+value,
+    success: function (modifiedDay){itineraries[dayIndex]=modifiedDay;giraffe(dayIndex+1);},
+    error: function (err) {console.log(err);}
+  });
+});
+
+var dict = {"foodGroup": "restaurants", "hotelGroup": "hotel", "actGroup": "activities"};
+
+$(".list-group").on("click",'.remove',function(){
+  var dayIndex = Number($('.current-day').text())-1;
+  var type = $(this).parent().parent().attr("id");
+  var rightType = dict[type];
+  if (type==="hotelGroup") {var url = '/api/remove/'+rightType+'/'+dayIndex;}
+  else {
+    var value = $(this).val();
+    var url = '/api/remove/'+rightType+'/'+dayIndex+'/'+value;
+  }
+  $.ajax({
+      method: 'GET',
+      url: url,
+      success: function (modifiedDay){itineraries[dayIndex]=modifiedDay;giraffe(dayIndex+1);},
+      error: function (err) {console.log(err);}
+    });
+});
+
+$("#addDay").on("click", function(){
+  var number = $('.day-buttons button').length;
+  $(this).before('<button class="btn btn-circle day-btn">'+ number +'</button>');
+  itineraries.push(new Day());
+});
+
+$('.day-buttons').on('click', '.day-btn', function(){
+  $('.day-btn').removeClass('current-day');
+  $(this).addClass('current-day');
+  var dayNumber = Number($(this).text());
+  giraffe(dayNumber);
+});
+
+$('#day-title').on('click', '.remove', function(){
+  var dayIndex = Number($('.current-day').text())-1;
+  // if there's only 1 day left, we don't want it deleted
+  if (itineraries.length>1) {
+    itineraries.splice(dayIndex, 1); // this removes the day in question
+    if (dayIndex !== itineraries.length){
+      giraffe(dayIndex +1 );
+      $('.day-buttons .day-btn').last().remove();
+    }
+    else {
+      giraffe(dayIndex);
+      $('.day-buttons .day-btn').last().remove();
+      $('.day-buttons .day-btn').last().addClass('current-day');
+    }    
+  }
+});
+// end of click events
 
 function initialize_gmaps() {
   var styleArr = [
@@ -45,7 +224,7 @@ function initialize_gmaps() {
   // get the maps div's HTML obj
   var map_canvas_obj = document.getElementById("map-canvas");
   // initialize a new Google Map with the options
-  var map = new google.maps.Map(map_canvas_obj, mapOptions);
+  map = new google.maps.Map(map_canvas_obj, mapOptions);
   map.mapTypes.set('map_style', styledMap);
   map.setMapTypeId('map_style');
   // Add the marker to the map
@@ -54,167 +233,15 @@ function initialize_gmaps() {
     title:"Hello World!"
   });
 
-  function drawLocation (location, opts, markerList,bounds) {
-    if (typeof opts !== 'object') {
-      opts = {};
-    }
-    opts.position = new google.maps.LatLng(location[0], location[1]);
-    opts.map = map;
-    var marker = new google.maps.Marker(opts);
-    markerList.push(marker);
-    if (bounds) {bounds.extend(marker.position);}
-  }
-
-  var hotelMarker = [];
-  var restaurantMarkers = [];
-  var activityMarkers = [];
-
-  function removeMarkers(){
-    if (hotelMarker.length) {
-      hotelMarker[0].setMap(null);
-      hotelMarker.length=0;
-    }
-    if (restaurantMarkers.length) {
-      restaurantMarkers.map(function(a){a.setMap(null);});
-      restaurantMarkers.length = 0;
-    }
-    if (activityMarkers.length) {
-      activityMarkers.map(function(a){a.setMap(null);});
-      activityMarkers.length = 0;
-    }
-  }
-
-  // draw some locations on the map
-  var hotelLocation = [];
-  var restaurantLocations = [];
-  var activityLocations = [];
-  
-  function drawAllLocations(hotelLocation,restaurantLocations,activityLocations) {
-    removeMarkers();
-    if (hotelLocation.length || restaurantLocations.length || activityLocations.length) {
-          var bounds = new google.maps.LatLngBounds();
-          if (hotelLocation.length){
-            drawLocation(hotelLocation, {icon: '/images/lodging_0star.png'}, hotelMarker, bounds);  
-          }
-        restaurantLocations.forEach(function (loc) {
-          drawLocation(loc, {
-            icon: '/images/restaurant.png'
-          },restaurantMarkers,bounds);
-        });
-        activityLocations.forEach(function (loc) {
-          drawLocation(loc, {
-            icon: '/images/star-3.png'
-          },activityMarkers,bounds);
-        });
-        map.fitBounds(bounds);
-    }
-  }
-
-  $("#addHotel").on("click",function(){
-    var dayIndex = Number($('.current-day').text())-1;
-    var value = $("#hotelList").val();
-    var hotel = all_hotels[value];
-    itineraries[dayIndex].hotel = hotel;
-    giraffe(dayIndex+1);
-  });
-
-  $("#addFood").on("click",function(){
-    var dayIndex = Number($('.current-day').text())-1;
-    var value = $("#foodList").val();
-    var food = all_restaurants[value];
-    itineraries[dayIndex].food.push(food);
-    giraffe(dayIndex+1);
-  });
-
-  $("#addAct").on("click",function(){
-    var dayIndex = Number($('.current-day').text())-1;
-    var value = $("#actList").val();
-    var act = all_activities[value];
-    itineraries[dayIndex].act.push(act);
-    giraffe(dayIndex+1);
-  });
-
-  var dict = {"foodGroup": "food", "hotelGroup": "hotel", "actGroup": "act"};
-
-  $(".list-group").on("click",'.remove',function(){
-    var dayIndex = Number($('.current-day').text())-1;
-    var type = $(this).parent().parent().attr("id");
-    var rightType = dict[type];
-    var listToModify = itineraries[dayIndex][rightType];
-    if (type==="hotelGroup") {
-      itineraries[dayIndex][rightType]=null;
-    }
-    else {
-      var name = $(this).val();
-      var temp = itineraries[dayIndex][rightType].filter(function(a){return a.name!=name;});
-      itineraries[dayIndex][rightType] = temp.map(function(a){return a;});
-    }
-    giraffe(dayIndex+1);
-  });
-
-  $("#addDay").on("click", function(){
-    var number = $('.day-buttons button').length;
-    $(this).before('<button class="btn btn-circle day-btn">'+ number +'</button>');
-    itineraries.push(new Day());
-  });
-
-  $('.day-buttons').on('click', '.day-btn', function(){
-    $('.day-btn').removeClass('current-day');
-    $(this).addClass('current-day');
-    var dayNumber = Number($(this).text());
-    giraffe(dayNumber);
-  });
-
-  function makeList (listID,items) {
-    // first clear existing contents
-    $(listID).html('');
-    // now add current items, if any
-    items.map(function(item){if (item) {$(listID).append('<li><span class="title">'+item.name+'</span><button value="'+item.name+'" class="btn btn-xs btn-danger remove btn-circle">x</button></li>');}});
-  }
-
-  function giraffe(dayNum){
-    // get the itinerary data for the day in question
-    var currentHotel = itineraries[dayNum-1].hotel;
-    var currentFood = itineraries[dayNum-1].food;
-    var currentAct = itineraries[dayNum-1].act;
-
-    // update the DOM to show the newly selected day
-    $('#day-title').html('<span>Day '+dayNum+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button>');
-    
-    // update the DOM to show the day's information
-    makeList("#hotelGroup",[currentHotel]);
-    makeList("#foodGroup",currentFood);
-    makeList("#actGroup",currentAct);
-    
-    // prep data for the map
-    if (currentHotel) {hotelLocation = [currentHotel.place[0].location[0],currentHotel.place[0].location[1]];}
-    else { hotelLocation = []; }
-    restaurantLocations = currentFood.map(function(food){return [food.place[0].location[0],food.place[0].location[1]];});
-    activityLocations = currentAct.map(function(act){return [act.place[0].location[0],act.place[0].location[1]];});
-
-    // update the map
-    drawAllLocations(hotelLocation,restaurantLocations,activityLocations);
-  }
-
-  $('#day-title').on('click', '.remove', function(){
-    var dayIndex = Number($('.current-day').text())-1;
-    // if there's only 1 day left, we don't want it deleted
-    if (itineraries.length>1) {
-      itineraries.splice(dayIndex, 1); // this removes the day in question
-      if (dayIndex !== itineraries.length){
-        giraffe(dayIndex +1 );
-        $('.day-buttons .day-btn').last().remove();
-      }
-      else {
-        giraffe(dayIndex);
-        $('.day-buttons .day-btn').last().remove();
-        $('.day-buttons .day-btn').last().addClass('current-day');
-      }    
-    }
-  });
 } //initialize gmaps
+
 
 $(document).ready(function() {
   initialize_gmaps();
-  itineraries.push(new Day());
+  $.ajax({
+    method: 'GET',
+    url: '/api/days',
+    success: function (data){itineraries=data;giraffe(1);},
+    error: function (err) {console.log(err);}
+  });
 });
