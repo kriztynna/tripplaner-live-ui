@@ -53,7 +53,7 @@ router.get('/remove/day/:idx',function(req,res){
     .then(function(trip){var id = trip.days[req.params.idx]; return Day.findOneAndRemove({_id: id}).exec(); })
     .then(function(){return Trip.findOne({});})
     .then(function(trip){trip.days.splice(req.params.idx,1);return trip.save()})
-    .then(function(trip){res.json(trip);});
+    .then(function(trip){res.redirect('/api/days');});
 });
 
 // set a hotel for a given day

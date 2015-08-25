@@ -181,16 +181,23 @@ $('#day-title').on('click', '.remove', function(){
   var dayIndex = Number($('.current-day').text())-1;
   // if there's only 1 day left, we don't want it deleted
   if (itineraries.length>1) {
-    itineraries.splice(dayIndex, 1); // this removes the day in question
-    if (dayIndex !== itineraries.length){
-      giraffe(dayIndex +1 );
-      $('.day-buttons .day-btn').last().remove();
-    }
-    else {
-      giraffe(dayIndex);
-      $('.day-buttons .day-btn').last().remove();
-      $('.day-buttons .day-btn').last().addClass('current-day');
-    }    
+    $.ajax({
+      method: 'GET',
+      url: '/api/remove/day/'+dayIndex,
+      success: function (remainingDays) {
+        itineraries=remainingDays;
+        if (dayIndex !== itineraries.length){
+          giraffe(dayIndex +1 );
+          $('.day-buttons .day-btn').last().remove();
+        }
+        else {
+          giraffe(dayIndex);
+          $('.day-buttons .day-btn').last().remove();
+          $('.day-buttons .day-btn').last().addClass('current-day');
+        }  
+      },
+      error: function (err) {console.log(err);}
+    });    
   }
 });
 // end of click events
