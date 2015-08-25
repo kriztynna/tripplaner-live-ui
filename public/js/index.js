@@ -250,13 +250,22 @@ function initialize_gmaps() {
 
 } //initialize gmaps
 
+function addDayBtn(num){
+  $("#addDay").before('<button class="btn btn-circle day-btn">'+ num +'</button>');
+}
 
 $(document).ready(function() {
   initialize_gmaps();
   $.ajax({
     method: 'GET',
     url: '/api/days',
-    success: function (data){itineraries=data;giraffe(1);},
+    success: function (data){
+      itineraries=data;
+      giraffe(1);
+      for (var i=1;i<itineraries.length;i++){
+        addDayBtn(i+1);
+      }
+    },
     error: function (err) {console.log(err);}
   });
 });
