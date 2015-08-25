@@ -34,7 +34,7 @@ router.get('/newday',function(req,res){
         day.save()
           .then(function(day){
             trip.days.push(day._id);
-            return trip.save(function(err,trip){res.redirect('/days');});
+            return trip.save(function(err,trip){res.redirect('./days');});
           });
         });
 });

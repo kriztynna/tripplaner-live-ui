@@ -26,12 +26,11 @@ function makeList (listID,items) {
 }
 
 function giraffe(dayNum){
-  console.log(itineraries);
   // get the itinerary data for the day in question
   var currentHotel = itineraries[dayNum-1].hotel;
   var currentFood = itineraries[dayNum-1].restaurants;
   var currentAct = itineraries[dayNum-1].activities;
-
+  
   // update the DOM to show the newly selected day
   $('#day-title').html('<span>Day '+dayNum+'</span><button class="btn btn-xs btn-danger remove btn-circle">x</button>');
   
@@ -104,6 +103,8 @@ function drawLocation (location, opts, markerList,bounds) {
 $("#addHotel").on("click",function(){
   var dayIndex = Number($('.current-day').text())-1;
   var value = $("#hotelList").val();
+  console.log(dayIndex);
+  console.log(value);
   $.ajax({
     method: 'GET',
     url: '/api/add/hotel/'+dayIndex+'/'+value,
@@ -155,8 +156,17 @@ $(".list-group").on("click",'.remove',function(){
 });
 
 $("#addDay").on("click", function(){
-  var number = $('.day-buttons button').length;
-  $(this).before('<button class="btn btn-circle day-btn">'+ number +'</button>');
+  var addBtn = $(this);
+  $.ajax({
+    method: 'GET',
+    url: '/api/newday',
+    success: function (data){
+      itineraries=data;
+      var number = data.length;
+      addBtn.before('<button class="btn btn-circle day-btn">'+ number +'</button>');
+    },
+    error: function (err){console.log(err);}
+  });
   itineraries.push(new Day());
 });
 
